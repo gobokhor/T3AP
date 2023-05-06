@@ -52,7 +52,7 @@ public class HW3_Q1_40131013 {
         public String getLibraryID() {
             return libraryID;
         }
-        public void addBook(String ID, String name, String author, String publishing, String year, String count, String category, String libraryID,
+        public void addBook(String ID, String name, String author, String publishing, String year, String count, String categoryID, String libraryID,
                             ArrayList<Source> sources,ArrayList<Category> categories, ArrayList<Library> libraries) {
             Library tempLib = findLibrary(libraryID, libraries);
             if (tempLib == null) {
@@ -64,17 +64,54 @@ public class HW3_Q1_40131013 {
                 System.out.println("duplicate-id");
                 return;
             }
-            Category tempCat = findCategory(category, categories);
+            Category tempCat = findCategory(categoryID, categories);
             if (tempCat == null) {
                 System.out.println("not-found");
                 return;
             }
-            sources.add(new Book(ID, name, author, year, category, libraryID, publishing, count));
+            sources.add(new Book(ID, name, author, publishing, year, count, categoryID, libraryID));
             System.out.println("success");
         }
-        public void addThesis(String ID, String name, String author, String year, String category,
-                              String libraryID, String supervisor, ArrayList<Source> sources,
+        public void addThesis(String ID, String name, String author, String supervisor, String year,
+                              String categoryID, String libraryID, ArrayList<Source> sources,
                               ArrayList<Category> categories, ArrayList<Library> libraries){
+            Library tempLib = findLibrary(libraryID, libraries);
+            if (tempLib == null) {
+                System.out.println("not-found");
+                return;
+            }
+            Thesis tempThesis = (Thesis) findSource(ID, tempLib.sources);
+            if (tempThesis != null) {
+                System.out.println("duplicate-id");
+                return;
+            }
+            Category tempCat = findCategory(categoryID, categories);
+            if (tempCat == null) {
+                System.out.println("not-found");
+                return;
+            }
+            sources.add(new Thesis(ID, name, author, supervisor, year, categoryID, libraryID));
+            System.out.println("success");
+        }
+        public void addGanjinehBook(String ID, String name, String author, String publishing, String year, String Donator,
+            String categoryID, String libraryID, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries){
+            Library tempLib = findLibrary(libraryID, libraries);
+            if (tempLib == null) {
+                System.out.println("not-found");
+                return;
+            }
+            GanjinehBook tempGanjinehBook = (GanjinehBook) findSource(ID, tempLib.sources);
+            if (tempGanjinehBook != null) {
+                System.out.println("duplicate-id");
+                return;
+            }
+            Category tempCat = findCategory(categoryID, categories);
+            if (tempCat == null) {
+                System.out.println("not-found");
+                return;
+            }
+            sources.add(new GanjinehBook(ID, name, author, publishing, year, Donator, categoryID, libraryID));
+
         }
     }
     public class Admin extends User implements studentAdder, libraryAdder, categoryAdder, staffAdder, userRemover {
@@ -220,6 +257,15 @@ public class Thesis extends Source {
         this.supervisor = supervisor;
     }
     // getter and setter ?
+}
+public class GanjinehBook extends Source {
+    private String donator;
+    private String publishing;
+    public GanjinehBook(String ID, String name, String author, String publishing, String year, String category, String libraryID, String donator) {
+        super(ID, name, author, year, category, libraryID);
+        this.donator = donator;
+        this.publishing = publishing;
+    }
 }
 public class Category {    
     private String name;
