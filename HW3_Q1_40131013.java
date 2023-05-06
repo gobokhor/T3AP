@@ -69,7 +69,9 @@ public class HW3_Q1_40131013 {
                 System.out.println("not-found");
                 return;
             }
-            sources.add(new Book(ID, name, author, publishing, year, count, categoryID, libraryID));
+            Book temp = new Book(ID, name, author, publishing, year, count, categoryID, libraryID);
+            sources.add(temp);
+            tempLib.sources.add(temp);
             System.out.println("success");
         }
         public void addThesis(String ID, String name, String author, String supervisor, String year,
@@ -90,7 +92,9 @@ public class HW3_Q1_40131013 {
                 System.out.println("not-found");
                 return;
             }
+            Thesis temp = new Thesis(ID, name, author, supervisor, year, categoryID, libraryID);
             sources.add(new Thesis(ID, name, author, supervisor, year, categoryID, libraryID));
+            tempLib.sources.add(temp);
             System.out.println("success");
         }
         public void addGanjinehBook(String ID, String name, String author, String publishing, String year, String Donator,
@@ -110,9 +114,31 @@ public class HW3_Q1_40131013 {
                 System.out.println("not-found");
                 return;
             }
-            sources.add(new GanjinehBook(ID, name, author, publishing, year, Donator, categoryID, libraryID));
-
+            GanjinehBook temp = new GanjinehBook(ID, name, author, publishing, year, Donator, categoryID, libraryID);
+            sources.add(temp);
+            tempLib.sources.add(temp);
         }
+        public void addSellingBook(String ID, String name, String author, String publishing, String year, String count,
+            String price, String discount, String categoryID, String libraryID, ArrayList<Source> sources,
+            ArrayList<Category> categories, ArrayList<Library> libraries){
+            Library tempLib = findLibrary(libraryID, libraries);
+            if (tempLib == null) {
+                System.out.println("not-found");
+                return;        
+            }
+            SellingBook tempSellingBook = (SellingBook) findSource(ID, tempLib.sources);
+            if (tempSellingBook != null) {
+                System.out.println("duplicate-id");
+                return;
+            }
+            Category tempCat = findCategory(categoryID, categories);
+            if (tempCat == null) {
+                System.out.println("not-found");
+                return;
+            }
+            SellingBook temp = new SellingBook(ID, name, author, publishing, year, count, price, discount, categoryID, libraryID);
+            sources.add(temp);
+            tempLib.sources.add(temp);
     }
     public class Admin extends User implements studentAdder, libraryAdder, categoryAdder, staffAdder, userRemover {
         public Admin(String ID, String password, String firstName, String lastName, String nationalCode, String birthYear, String address) {
@@ -243,7 +269,7 @@ abstract public class Source {
 public class Book extends Source {
     private String publishing;
     private String count;
-    public Book (String ID, String name, String author, String year, String category, String libraryID, String publishing, String count) {
+    public Book (String ID, String name, String author, String publishing,  String year, String count, String category, String libraryID) {
         super(ID, name, author, year, category, libraryID);
         this.publishing = publishing;
         this.count = count;
@@ -252,19 +278,28 @@ public class Book extends Source {
 }
 public class Thesis extends Source {
     private String supervisor;
-    public Thesis (String ID, String name, String author, String year, String category, String libraryID, String supervisor) {
+    public Thesis (String ID, String name, String author, String supervisor, String year, String category, String libraryID) {
         super(ID, name, author, year, category, libraryID);
         this.supervisor = supervisor;
     }
     // getter and setter ?
 }
-public class GanjinehBook extends Source {
+public class GanjinehBook extends Book {
     private String donator;
-    private String publishing;
-    public GanjinehBook(String ID, String name, String author, String publishing, String year, String category, String libraryID, String donator) {
-        super(ID, name, author, year, category, libraryID);
+    //private String publishing;
+    public GanjinehBook(String ID, String name, String author, String publishing, String year, String donator, String category, String libraryID) {
+        super(ID, name, author, publishing, year, "1", category, libraryID);
         this.donator = donator;
-        this.publishing = publishing;
+        //this.publishing = publishing;
+    }
+}
+public class SellingBook extends Book {
+    private String price;
+    private String discount;
+    public SellingBook(String ID, String name, String author, String publishing, String year, String count, String price, String discount, String category, String libraryID){
+        super(ID, name, author, publishing, year, count, category, libraryID);
+        this.price = price;
+        this.discount = discount;
     }
 }
 public class Category {    
@@ -309,6 +344,14 @@ public interface bookAdder {
 public interface thesisAdder {
     public void addThesis(String ID, String name, String author, String supervisor, String year, String categoryID,
                           String libraryID, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries);
+}
+public interface ganjinehBookAdder {
+    public void addGanjinehBook(String ID, String name, String author, String publishing, String year, String donator, String categoryID,
+                                String libraryID, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries);
+}
+public interface sellingBookAdder {
+    public void addSellingBook(String ID, String name, String author, String publishing, String year, String count, String price, String discount, String categoryID,
+                               String libraryID, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries);
 }
 public class Library {
     private final String ID;
