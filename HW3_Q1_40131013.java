@@ -117,6 +117,7 @@ public class HW3_Q1_40131013 {
             GanjinehBook temp = new GanjinehBook(ID, name, author, publishing, year, Donator, categoryID, libraryID);
             sources.add(temp);
             tempLib.sources.add(temp);
+            System.out.println("success");
         }
         public void addSellingBook(String ID, String name, String author, String publishing, String year, String count,
             String price, String discount, String categoryID, String libraryID, ArrayList<Source> sources,
@@ -139,6 +140,25 @@ public class HW3_Q1_40131013 {
             SellingBook temp = new SellingBook(ID, name, author, publishing, year, count, price, discount, categoryID, libraryID);
             sources.add(temp);
             tempLib.sources.add(temp);
+            System.out.println("success");
+        }
+        public void removeResource(String ID, String libraryID, ArrayList<Source> sources, ArrayList<Library> libraries){
+            Library tempLib = findLibrary(libraryID, libraries);
+            if (tempLib == null) {
+                System.out.println("not-found");
+                return;
+            }
+            Source tempSource = findSource(ID, tempLib.sources);
+            if (tempSource == null) {
+                System.out.println("not-found");
+                return;
+            }
+            // age to gharz bashe not-allowed
+            sources.remove(tempSource);
+            tempLib.sources.remove(tempSource);
+            System.out.println("success");
+        }
+        
     }
     public class Admin extends User implements studentAdder, libraryAdder, categoryAdder, staffAdder, userRemover {
         public Admin(String ID, String password, String firstName, String lastName, String nationalCode, String birthYear, String address) {
@@ -500,37 +520,72 @@ public void manageCommands(String command, ArrayList<Library> libraries, ArrayLi
             return;
         }
         if (commandStart.contains("thesis") || commandStart.contains("book") || commandStart.contains("resource")) {
-            if(findLibrary(args[8], libraries) == null){
-                System.out.println("not-found"); // ??
-                return;
+            int indexOfLibrary = 0;
+            switch (commandStart) {
+                case "add-book":
+                case "add-ganjineh-book":
+                    indexOfLibrary = 9;
+                    break;
+                case "add-thesis":
+                    indexOfLibrary = 8;
+                    break;
+                case "add-selling-book":
+                    indexOfLibrary = 11;
+                    break;
+                case "remove-resource":
+                    indexOfLibrary = 3;
+                    break;
+            }
+            if (!(commandStart.equals("remove-resource"))){
+                if(findLibrary(args[indexOfLibrary], libraries) == null){
+                    System.out.println("not-found"); // ??
+                    return;         // bayad permission bokhore
+                }
             }
             if (!(user instanceof Manager)) {
                 System.out.println("permission-denied");
                 return;
             }
             Manager manager = (Manager) user;
-            if (!(manager.getLibraryID().equals(args[8]))){
+            if (!(manager.getLibraryID().equals(args[indexOfLibrary]))){
                 System.out.println("permission-denied");
                 return;
             }
             // check admin and his premissions
+            if(findLibrary(args[indexOfLibrary], libraries) == null){
+                System.out.println("not-found"); // ??
+                return;
+            }
+            if (!(manager.getLibraryID().equals(args[indexOfLibrary]))){
+                System.out.println("permission-denied");
+                return;
+            }
             switch (commandStart) {
                 case "add-book":
                     manager.addBook(args[2], args[3], args[4], args[5], args[6], args[7], args[8],
-                                    args[9], sources, categories, libraries);
+                    args[9], sources, categories, libraries);
                     break;
                 case "add-thesis":
                     manager.addThesis(args[2], args[3], args[4], args[5], args[6], args[7], args[8],
-                                      sources, categories, libraries);
+                    sources, categories, libraries);
                     break;
                 case "add-ganjineh-book":
-
+                    manager.addGanjinehBook(args[2], args[3], args[4], args[5], args[6], args[7], args[8],
+                    args[9], sources, categories, libraries);
                     break;
                 case "add-selling-book":
-                    
+                    manager.addSellingBook(args[2], args[3], args[4], args[5], args[6], args[7], args[8],
+                    args[9], args[10], args[11], sources, categories, libraries);
+                    break;
+                case "remove-resource":
+                    manager.removeResource(args[2], args[3], sources, libraries);
                     break;
             }
-        } else {
+            
+        } /* else if(commandStart.contains("resource")){
+            
+
+        }  */else {
             if (!(user instanceof Admin)) {
                 System.out.println("permission-denied");
                 return;
