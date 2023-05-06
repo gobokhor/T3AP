@@ -52,8 +52,8 @@ public class HW3_Q1_40131013 {
         public String getLibraryID() {
             return libraryID;
         }
-        public void addBook(String ID, String name, String author, String year, String category, String libraryID,
-        String publishing, String count, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries) {
+        public void addBook(String ID, String name, String author, String publishing, String year, String count, String category, String libraryID,
+                            ArrayList<Source> sources,ArrayList<Category> categories, ArrayList<Library> libraries) {
             Library tempLib = findLibrary(libraryID, libraries);
             if (tempLib == null) {
                 System.out.println("not-found");
@@ -77,26 +77,27 @@ public class HW3_Q1_40131013 {
                               ArrayList<Category> categories, ArrayList<Library> libraries){
         }
     }
-    public class Admin extends User implements studentRemover, studentAdder, libraryAdder, categoryAdder, staffAdder {
+    public class Admin extends User implements studentAdder, libraryAdder, categoryAdder, staffAdder, userRemover {
         public Admin(String ID, String password, String firstName, String lastName, String nationalCode, String birthYear, String address) {
             super(ID, password, firstName, lastName, nationalCode, birthYear, address);
         }
-        @Override
-        public void removeStudent(String ID, ArrayList<Student> students) {
-            for (Student student : students) {
-                if (student.getID().equals(ID)) {
-                    students.remove(student);
+       /*  @Override
+        public void removeUser(String ID, ArrayList<User> users) {
+            for (User user : users) {
+                if (user.getID().equals(ID)) {
+                    users.remove(user);
                     System.out.println("success");
                     return;
                 }
             }
             System.out.println("not-found");
-        }
+        } */
         @Override
         public void addStudent(String ID, String pass, String fName, String lName, String nCode,
                                String bYear, String address, ArrayList<User> users) {
             if (findUserWithoutPass(ID, users) != null) {
                 System.out.println("duplicate-id");
+                return;
             }
             users.add(new Student(ID, pass, fName, lName, nCode, bYear, address));
             System.out.println("success");
@@ -141,6 +142,7 @@ public class HW3_Q1_40131013 {
                              String bYear, String address, String type, ArrayList<User> users) {
             if (findUserWithoutPass(ID, users) != null) {
                 System.out.println("duplicate-id");
+                return;
             }
             switch (type) {
                 case "staff":
@@ -149,9 +151,6 @@ public class HW3_Q1_40131013 {
                 case "professor":
                     users.add(new Professor(ID, pass, fName, lName, nCode, bYear, address));
                     break;
-                default:
-                // ???????
-                    break;
             }
             System.out.println("success");
         }
@@ -159,9 +158,11 @@ public class HW3_Q1_40131013 {
                                String bYear, String address, String libID, ArrayList<User> users, ArrayList<Library> libraries) {
             if (findUserWithoutPass(ID, users) != null) {
                 System.out.println("duplicate-id");
+                return;
             }
             if (findLibrary(libID, libraries) == null) {
                 System.out.println("not-found");
+                return;
             }
             users.add(new Manager(ID, pass, fName, lName, nCode, bYear, address, libID));
             System.out.println("success");
@@ -172,9 +173,12 @@ public class HW3_Q1_40131013 {
                 System.out.println("not-found");
                 return;
             }
-
             // age ketab ya payanname gharz gerefte bashe ya mablaghi bedehkar bashe nemitoone remove beshe
-            System.out.println("not-allowed");
+            //System.out.println("not-allowed");
+            users.remove(tempUser);
+            System.out.println("success");
+            return;
+            
 
         }
 
@@ -217,7 +221,6 @@ public class Thesis extends Source {
     }
     // getter and setter ?
 }
-
 public class Category {    
     private String name;
     private String ID;
@@ -231,10 +234,6 @@ public class Category {
     public void setName(String name) {this.name = name;}
 }
 
-
-public interface studentRemover {
-    public void removeStudent(String ID, ArrayList<Student> students);
-}
 public interface studentAdder {
     public void addStudent(String ID, String pass, String fName, String lName, String nCode,
                            String bYear, String address, ArrayList<User> users);
@@ -249,6 +248,9 @@ public interface categoryAdder {
 public interface staffAdder {
     public void addStaff(String ID, String pass, String fName, String lName, String nCode,
                          String bYear, String address, String type, ArrayList<User> users);
+}
+public interface userRemover {
+    public void removeUser(String ID, ArrayList<User> users);
 }
 public interface managerAdder {
     public void addManager(String ID, String pass, String fName, String lName, String nCode,
@@ -356,26 +358,15 @@ public Source findSourceInLibrary(String ID, String lidID, ArrayList<Library> li
 
 
 public static void main(String[] args) throws IOException {
+    PrintStream out = new PrintStream(new FileOutputStream("kh.txt"));
+    System.setOut(out);
     HW3_Q1_40131013 main = new HW3_Q1_40131013();
     ArrayList<Library> libraries = new ArrayList<Library>();
     ArrayList<Category> categories = new ArrayList<Category>();
-    //ArrayList<Admin> admins = new ArrayList<>();
     ArrayList<User> users = new ArrayList<>();
-    //ArrayList<Student> students = new ArrayList<>();
     ArrayList<Source> sources = new ArrayList<>();
-
-    // users? students? 
-    Admin admin = main.new Admin("admin", "AdminPass", "admin", "adminZade", "admin1234", "admin", "adminAbad");
+    Admin admin = main.new Admin("admin", "AdminPass", "admini", "adminZade", "admin1234", "farvardin", "adminAbad");
     users.add(admin);
-    PrintStream out = main.new PrintStream(new FileOutputStream("output.txt", true), true);
-    System.setOut(out);
-    //admins.add(admin);
-    
-    //ArrayList<Admin> admins = new ArrayList<Admin>(); // ??
-    //
-    //
-    //
-   // main.new Category("null", "null");
     categories.add(main.new Category("null", "null"));
     String command;
     Scanner scanner = new Scanner(System.in);
@@ -409,7 +400,7 @@ public void manageCommands(String command, ArrayList<Library> libraries, ArrayLi
         }
     }
     else {
-        ID = command.substring(sharpIndex + 1, firstLineIndex);
+        ID = command.substring(sharpIndex + 1, firstLineIndex); // باگ داره
         User user = findUserWithoutPass(ID, users);
         if (user == null) {
             System.out.println("not-found");
@@ -444,13 +435,13 @@ public void manageCommands(String command, ArrayList<Library> libraries, ArrayLi
                                       sources, categories, libraries);
                     break;
                 case "add-ganjineh-book":
-    
+
                     break;
                 case "add-selling-book":
                     
                     break;
             }
-        }else {
+        } else {
             if (!(user instanceof Admin)) {
                 System.out.println("permission-denied");
                 return;
@@ -463,14 +454,22 @@ public void manageCommands(String command, ArrayList<Library> libraries, ArrayLi
                 case "add-category":
                     admin.addCategory(args[2], args[3], args[4], categories);
                     break;
-                case "add"
+                case "add-student":
+                    admin.addStudent(args[2], args[3], args[4], args[5], args[6], args[7], args[8], users);
+                    break;
+                case "add-staff":
+                    admin.addStaff(args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], users);
+                    break;
+                case "add-manager":
+                    admin.addManager(args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], users, libraries);
+                    break;
+                case "remove-user":
+                    admin.removeUser(args[2], users);
+                    break;
+                
             }
         }
     }
 }
-
-
-
-
 
 }
