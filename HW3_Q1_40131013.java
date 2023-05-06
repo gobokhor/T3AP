@@ -1,4 +1,7 @@
 import java.util.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 public class HW3_Q1_40131013 {
 
     abstract public class User {
@@ -259,12 +262,6 @@ public interface thesisAdder {
     public void addThesis(String ID, String name, String author, String supervisor, String year, String categoryID,
                           String libraryID, ArrayList<Source> sources, ArrayList<Category> categories, ArrayList<Library> libraries);
 }
-
-
-
-
-
-
 public class Library {
     private final String ID;
     private final String name;
@@ -314,7 +311,6 @@ public Admin findAdmin(String ID, String pass, ArrayList<Admin> admins, ArrayLis
     Admin admin = (Admin) temp;
     return admin;
 }
-
 public Library findLibrary(String ID, ArrayList<Library> libraries) {
     for (Library library : libraries) {
         if (library.getID().equals(ID)) {
@@ -359,11 +355,7 @@ public Source findSourceInLibrary(String ID, String lidID, ArrayList<Library> li
 
 
 
-
-
-
-
-public static void main(String[] args) {
+public static void main(String[] args) throws IOException {
     HW3_Q1_40131013 main = new HW3_Q1_40131013();
     ArrayList<Library> libraries = new ArrayList<Library>();
     ArrayList<Category> categories = new ArrayList<Category>();
@@ -375,6 +367,8 @@ public static void main(String[] args) {
     // users? students? 
     Admin admin = main.new Admin("admin", "AdminPass", "admin", "adminZade", "admin1234", "admin", "adminAbad");
     users.add(admin);
+    PrintStream out = main.new PrintStream(new FileOutputStream("output.txt", true), true);
+    System.setOut(out);
     //admins.add(admin);
     
     //ArrayList<Admin> admins = new ArrayList<Admin>(); // ??
@@ -469,6 +463,7 @@ public void manageCommands(String command, ArrayList<Library> libraries, ArrayLi
                 case "add-category":
                     admin.addCategory(args[2], args[3], args[4], categories);
                     break;
+                case "add"
             }
         }
     }
